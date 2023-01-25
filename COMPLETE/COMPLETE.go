@@ -59,7 +59,7 @@ func stage_resize(pack_folder string) string {
 	if _, err := os.Stat(resized_folder); os.IsNotExist(err) {
 		os.Mkdir(resized_folder, os.ModePerm)
 	}
-	input_cmd := []string{"-i", pack_folder, "-o", resized_folder, "-t", *resize_threads, "-target_size", *target_size, "-err_only", "-model", *model}
+	input_cmd := []string{"-input", pack_folder, "-output", resized_folder, "-threads", *resize_threads, "-target_size", *target_size, "-model", *model, "-log"}
 	if *force_srgan {
 		input_cmd = append(input_cmd, "-srgan")
 	}
@@ -97,7 +97,7 @@ func stage_resize_ani(pack_folder string, resized_folder string, formats []strin
 }
 
 func stage_transcode(input_folder, output_folder, format string) {
-	encode_cmd := exec.Command("BatchConvert", "-i", input_folder, "-o", output_folder, "-f", format, "-err_only")
+	encode_cmd := exec.Command("BatchConvert", "-input", input_folder, "-output", output_folder, "-format", format, "-log")
 	encode_cmd.Stdout = os.Stdout
 	encode_cmd.Stderr = os.Stderr
 	if err := encode_cmd.Run(); err != nil {
@@ -121,7 +121,6 @@ func process(pack string) {
 	libs.PrintSign(pack, "main")
 
 	// ====== Stage 1: Transcode to/from JXL ======
-
 	if *source_format == "jxl" {
 		color.Greenf("\nStage 1: Decode JXL to PNG\n")
 		stage_transcode(pack, pack, "djxl")
@@ -134,7 +133,6 @@ func process(pack string) {
 	}
 
 	// ====== Stage 2: Resize ======
-
 	color.Greenf("\nStage 2: Resizing images\n")
 	resize_folder := stage_resize(pack)
 
@@ -146,17 +144,10 @@ func process(pack string) {
 	stage_resize_ani(pack, transcoded_folder, []string{".mp4", ".mkv", ".webm", ".gif"})
 
 	// ====== Stage 3: Transcode ======
-
 	color.Greenf("\nStage 3: Transcode\n")
-	switch *format {
-	case "webp":
-		stage_transcode(resize_folder, transcoded_folder, "cwebp")
-	case "avif":
-		stage_transcode(resize_folder, transcoded_folder, "avif")
-	}
+	stage_transcode(resize_folder, transcoded_folder, *format)
 
 	// ====== Stage 4: Compress ======
-
 	if !*single {
 		color.Greenf("\nStage 4: Compress\n")
 		if *source_format != "jxl" {
@@ -166,7 +157,6 @@ func process(pack string) {
 	}
 
 	// ====== Stage 5: Cleanup ======
-
 	if *single {
 		color.Greenf("\nStage 5: Re-organizing files\n")
 		// Create a jxl folder for the transcoded jxl files
