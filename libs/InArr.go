@@ -1,14 +1,14 @@
 package libs
 
-func InArr(elem string, arr []string) string {
-	for _, v := range arr {
-		if len(elem) < len(v) {
-			if elem == v[:len(elem)] {
-				return v
+func InArr(element string, array []string) string {
+	for _, value := range array {
+		if len(element) < len(value) {
+			if element == value[:len(element)] {
+				return value
 			}
 		} else {
-			if elem == v {
-				return v
+			if element == value {
+				return value
 			}
 		}
 	}
