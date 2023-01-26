@@ -145,6 +145,14 @@ func startResize(input_file_list []string, log *os.File) {
 }
 
 func main() {
+
+	realesrgan_in_path := libs.CheckIfBinaryInPath("realesrgan-ncnn-vulkan")
+	ffmpeg_in_path := libs.CheckIfBinaryInPath("ffmpeg")
+	if !realesrgan_in_path || !ffmpeg_in_path {
+		libs.PrintErr(os.Stderr, "Error: realesrgan-ncnn-vulkan and ffmpeg not found in PATH\n")
+		os.Exit(1)
+	}
+
 	if libs.Rel(*input) == libs.Rel(*output) {
 		libs.PrintErr(os.Stderr, "Input and output folder are the same, please use -o to specify output folder")
 		os.Exit(1)

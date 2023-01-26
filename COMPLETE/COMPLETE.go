@@ -175,6 +175,15 @@ func process(pack string) {
 }
 
 func main() {
+
+	BatchResize_in_path := libs.CheckIfBinaryInPath("BatchResize")
+	BatchConvert_in_path := libs.CheckIfBinaryInPath("BatchConvert")
+	if !BatchResize_in_path || !BatchConvert_in_path {
+		libs.PrintErr(os.Stderr, "Error: BatchResize and BatchConvert not found in PATH\n")
+		os.Exit(1)
+	}
+
+
 	if !libs.IsDir(*input) {
 		libs.PrintErr(os.Stderr, "Input must be a folder\n")
 		os.Exit(1)
