@@ -28,11 +28,6 @@ var (
 	all_input_extensions   []string
 	allow_input_extensions map[string][]string
 	output_extensions      map[string]string
-
-	ffmpegInPath  bool
-	avifencInPath bool
-	cjxlInPath    bool
-	djxlInPath    bool
 )
 
 func init() {
@@ -56,24 +51,19 @@ func init() {
 		*output_folder = libs.Rel(*output_folder)
 	}
 
-	ffmpegInPath = libs.CheckIfBinaryInPath("ffmpeg")
-	avifencInPath = libs.CheckIfBinaryInPath("avifenc")
-	cjxlInPath = libs.CheckIfBinaryInPath("cjxl")
-	djxlInPath = libs.CheckIfBinaryInPath("djxl")
-
-	if *output_format == "avif" && !avifencInPath && !ffmpegInPath {
+	if *output_format == "avif" && !libs.CheckIfBinaryInPath("avifenc") && libs.CheckIfBinaryInPath("ffmpeg") {
 		libs.PrintErr(os.Stderr, "Error: avifenc or ffmpeg not found in path\n")
 		os.Exit(1)
 	}
-	if *output_format == "cjxl" && !cjxlInPath {
+	if *output_format == "cjxl" && !libs.CheckIfBinaryInPath("cjxl") {
 		libs.PrintErr(os.Stderr, "Error: cjxl not found in path\n")
 		os.Exit(1)
 	}
-	if *output_format == "djxl" && !djxlInPath {
+	if *output_format == "djxl" && !libs.CheckIfBinaryInPath("djxl") {
 		libs.PrintErr(os.Stderr, "Error: djxl not found in path\n")
 		os.Exit(1)
 	}
-	if *output_format == "webp" && !ffmpegInPath {
+	if *output_format == "webp" && !libs.CheckIfBinaryInPath("ffmpeg") {
 		libs.PrintErr(os.Stderr, "Error: ffmpeg not found in path\n")
 		os.Exit(1)
 	}
@@ -162,6 +152,7 @@ func startConvert(file_list []string, log *os.File) {
 }
 
 func main() {
+
 	media := libs.ListFiles(*input_folder, allow_input_extensions[*output_format], true, false)
 
 	var log *os.File

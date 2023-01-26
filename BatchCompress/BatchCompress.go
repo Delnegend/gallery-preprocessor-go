@@ -45,6 +45,12 @@ func compress(path string, format string, extension_list_ string) {
 }
 
 func main() {
+
+	if !libs.CheckIfBinaryInPath("7z") {
+		libs.PrintErr(os.Stderr, "Error: 7z not found in PATH\n")
+		os.Exit(1)
+	}
+
 	folders_to_compress := libs.ListFolders(".", false)
 	for _, folder := range folders_to_compress {
 		compress(folder, *output_file_format, *input_file_extension)
