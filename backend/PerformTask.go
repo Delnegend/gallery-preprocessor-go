@@ -37,7 +37,7 @@ type TaskInput struct {
 	Inputs []string
 }
 
-func PerformTask(ctx context.Context, taskCtx context.Context, taskInput TaskInput, progressChan chan<- float64, warnChan chan<- error) {
+func PerformTask(taskCtx context.Context, taskInput TaskInput, progressChan chan<- float64, warnChan chan<- error) {
 	var taskMutex sync.Mutex
 	taskMutex.Lock()
 
@@ -72,17 +72,17 @@ func PerformTask(ctx context.Context, taskCtx context.Context, taskInput TaskInp
 
 	switch taskInput.TaskID {
 	case TaskArtefact:
-		tasks.Artefact(ctx, files, 2, updateProgressBase, sendWarning)
+		tasks.Artefact(taskCtx, files, 2, updateProgressBase, sendWarning)
 	case TaskArtefactJxl:
-		tasks.ArtefactJxl(ctx, files, 2, updateProgressBase, sendWarning)
+		tasks.ArtefactJxl(taskCtx, files, 2, updateProgressBase, sendWarning)
 	case TaskCjxlLossLess:
-		tasks.Cjxl(ctx, files, 2, false, updateProgressBase, sendWarning)
+		tasks.Cjxl(taskCtx, files, 2, false, updateProgressBase, sendWarning)
 	case TaskCjxlLossy:
-		tasks.Cjxl(ctx, files, 2, true, updateProgressBase, sendWarning)
+		tasks.Cjxl(taskCtx, files, 2, true, updateProgressBase, sendWarning)
 	case TaskDjxl:
-		tasks.Djxl(ctx, files, 2, updateProgressBase, sendWarning)
+		tasks.Djxl(taskCtx, files, 2, updateProgressBase, sendWarning)
 	case TaskPar2:
-		tasks.Par2(ctx, files, 2, updateProgressBase, sendWarning)
+		tasks.Par2(taskCtx, files, 2, updateProgressBase, sendWarning)
 	default:
 		sendWarning(fmt.Errorf("internal error: unknown task %s", taskInput.TaskID))
 	}
