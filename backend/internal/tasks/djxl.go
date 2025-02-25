@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"syscall"
 )
 
 // Djxl reconstructs original jpg from jxl files, if possible, else to png.
@@ -72,6 +73,7 @@ func Djxl(
 
 			// try reconstruct original jpg
 			cmd := exec.CommandContext(ctx, "djxl", inputJxlFile, outputJpgFile)
+			cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 			outputMsgBytes, err := cmd.CombinedOutput()
 			outputMsgString := string(outputMsgBytes)
 			switch {
@@ -100,6 +102,7 @@ func Djxl(
 
 			// jxl -> png
 			cmd = exec.CommandContext(ctx, "djxl", inputJxlFile, outputPngFile)
+			cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 			outputMsgBytes, err = cmd.CombinedOutput()
 			outputMsgString = string(outputMsgBytes)
 

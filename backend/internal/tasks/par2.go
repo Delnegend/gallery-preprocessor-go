@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"syscall"
 )
 
 func Par2(
@@ -50,6 +51,7 @@ func Par2(
 			defer updateProgress()
 
 			cmd := exec.CommandContext(ctx, "par2j64.exe", "c", "/rr11", input7zFile+".par2", input7zFile)
+			cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 			outputMsgBytes, err := cmd.CombinedOutput()
 			outputMsgString := string(outputMsgBytes)
 			switch {

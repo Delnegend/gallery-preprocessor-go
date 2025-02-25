@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"syscall"
 )
 
 func Cjxl(
@@ -75,6 +76,7 @@ func Cjxl(
 
 			// convert jpg/png to jxl
 			cmd := exec.CommandContext(ctx, "cjxl", inputFile, outputFile, "-d", distance, "-e", "9")
+			cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 			outputMsgBytes, err := cmd.CombinedOutput()
 			outputMsgString := string(outputMsgBytes)
 			switch {

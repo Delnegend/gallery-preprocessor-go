@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"syscall"
 )
 
 func ArtefactJxl(
@@ -70,6 +71,7 @@ func ArtefactJxl(
 
 			// jpg --artefact--> png
 			cmd := exec.CommandContext(ctx, "artefact-cli", inputJpgFile, "-o", outputPngFile, "-i", "50")
+			cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 			outputMsgBytes, err := cmd.CombinedOutput()
 			outputMsgString := string(outputMsgBytes)
 			switch {
@@ -83,6 +85,7 @@ func ArtefactJxl(
 
 			// png -> jxl
 			cmd = exec.CommandContext(ctx, "cjxl", outputPngFile, outputJxlFile, "-d", "1", "-e", "9")
+			cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 			outputMsgBytes, err = cmd.CombinedOutput()
 			outputMsgString = string(outputMsgBytes)
 			switch {
