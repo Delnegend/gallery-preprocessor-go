@@ -5,7 +5,6 @@ import (
 	"embed"
 	"fmt"
 	"gallery-preprocessor-go/backend"
-	"log/slog"
 	"sync"
 
 	"github.com/wailsapp/wails/v2"
@@ -67,7 +66,6 @@ func main() {
 			progressChan := make(chan float64)
 			warnChan := make(chan error)
 			var taskMutex sync.Mutex
-			taskCancels := make(map[backend.TaskID]context.CancelFunc)
 
 			go func() {
 				for progress := range progressChan {
@@ -80,6 +78,7 @@ func main() {
 				}
 			}()
 
+			var taskCancel context.CancelFunc
 			for _, taskType := range backend.AllTasks {
 				taskID := taskType.TSName
 				runtime.EventsOn(ctx, taskID, func(data ...interface{}) {
@@ -91,9 +90,9 @@ func main() {
 					taskMutex.Lock()
 					defer taskMutex.Unlock()
 
-					taskCtx, taskCancel := context.WithCancel(ctx)
-					taskCancels[taskType.Value] = taskCancel
-					defer func() { taskCancels[taskType.Value] = nil }()
+					var taskCtx context.Context
+					taskCtx, taskCancel = context.WithCancel(ctx)
+					defer func() { taskCancel = nil }()
 
 					taskInput := backend.TaskInput{Inputs: []string{}, TaskID: taskType.Value}
 					for _, input := range data[0].([]interface{}) {
@@ -107,17 +106,12 @@ func main() {
 
 					runtime.EventsEmit(ctx, string(TaskStartEmitID), taskID)
 					defer runtime.EventsEmit(ctx, string(TaskDoneEmitID), taskID)
-					backend.PerformTask(app.ctx, taskCtx, taskInput, progressChan, warnChan)
+					backend.PerformTask(taskCtx, taskInput, progressChan, warnChan)
 				})
 			}
 			runtime.EventsOn(ctx, string(CancelTaskEmitID), func(data ...interface{}) {
-				taskMutex.Lock()
-				defer taskMutex.Unlock()
-				slog.Info("received cancel task event")
-				for _, taskCancel := range taskCancels {
-					if taskCancel != nil {
-						taskCancel()
-					}
+				if taskCancel != nil {
+					taskCancel()
 				}
 				runtime.EventsEmit(ctx, string(TaskDoneEmitID))
 			})
