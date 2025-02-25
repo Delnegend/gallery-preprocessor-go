@@ -1,4 +1,3 @@
-*.exe
-./demo
-./sample
-*.gif
+build/bin
+node_modules
+frontend/dist
