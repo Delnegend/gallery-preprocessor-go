@@ -16,40 +16,40 @@ const tasks = ([
 	[
 		backend.TaskID.Artefact,
 		"Artefact",
-		"Remove JPEG artifacts and output PNG.<br /><br />Accepts: JPG"
+		"Remove JPEG artifacts and output PNG.<br /><br />Accepts: JPG",
 	],
 	[
 		backend.TaskID.ArtefactJxl,
 		"Artefact + CJXL (Lossy)",
-		"Remove JPEG artifacts and output PNG, then compress to JXL (lossy).<br /><br />Accepts: <code>.jpg</code>"
+		"Remove JPEG artifacts and output PNG, then compress to JXL (lossy).<br /><br />Accepts: <code>.jpg</code>",
 	],
 	[
 		backend.TaskID.CjxlLossless,
 		"CJXL (Lossless)",
-		"Compress JPG/PNG to JXL (lossless).<br /><br />Accepts: <code>.jpg</code>, <code>.png</code>"
+		"Compress JPG/PNG to JXL (lossless).<br /><br />Accepts: <code>.jpg</code>, <code>.png</code>",
 	],
 	[
 		backend.TaskID.CjxlLossy,
 		"CJXL (Lossy)",
-		"Compress JPG/PNG to JXL (lossy).<br /><br />Accepts: <code>.jpg</code>, <code>.png</code>"
+		"Compress JPG/PNG to JXL (lossy).<br /><br />Accepts: <code>.jpg</code>, <code>.png</code>",
 
 	],
 	[
 		backend.TaskID.Djxl,
 		"DJXL",
-		"Decompress JXL to JPG/PNG.<br /><br />Accepts: <code>.jxl</code>"
+		"Decompress JXL to JPG/PNG.<br /><br />Accepts: <code>.jxl</code>",
 	],
 	[
 		backend.TaskID.Par2,
 		"PAR2",
-		"Create parity files for 7z.<br /><br />Accepts: <code>.7z</code>"
+		"Create parity files for 7z.<br /><br />Accepts: <code>.7z</code>",
 	],
 ] satisfies Array<[backend.TaskID, string, string]>)
 	.map(([ID, Label, Description]) => ({
 		ID,
 		Label,
 		Description,
-		Bounds: { X: 0, Y: 0, Width: 0, Height: 0 }
+		Bounds: { X: 0, Y: 0, Width: 0, Height: 0 },
 	}));
 
 const resizeObserver = new ResizeObserver((entries) => {
@@ -103,10 +103,10 @@ onUnmounted(() => {
 </script>
 
 <template>
-	<div class="grid grid-rows-[auto,auto,1fr] h-dvh">
+	<div class="grid h-dvh grid-rows-[auto,auto,1fr]">
 		<Button
 			variant="destructive"
-			class="h-12 w-full rounded-none text-xl top-0"
+			class="top-0 h-12 w-full rounded-none text-xl"
 			size="lg"
 			:onclick="() => EventsEmit(main.OtherEmitID.CancelTask, runningTask)"
 			:disabled="runningTask === null">
@@ -125,22 +125,22 @@ onUnmounted(() => {
 				:key="task.ID"
 				:id="task.ID"
 				:class="cn(
-					'border text-base border-secondary-foreground/30 px-3 py-2 flex justify-center items-center h-full text-center',
-					runningTask === task.ID && 'animate-bounce',
-					runningTask !== null && runningTask !== task.ID && 'text-secondary-foreground/50'
+					'border text-base border-secondary-foreground/30 backdrop-blur-sm px-3 py-2 flex justify-center items-center h-full text-center',
+					runningTask === task.ID && 'text-blue-400 font-black',
+					runningTask !== null && runningTask !== task.ID && 'text-secondary-foreground/50 font-extralight'
 				)">
-				<HoverCard :openDelay="100" :closeDelay="100">
-					<HoverCardTrigger class="hover:underline underline-offset-4">
+				<HoverCard :openDelay="500" :closeDelay="100">
+					<HoverCardTrigger class="select-none underline-offset-4 hover:font-bold">
 						{{ task.Label }}
 					</HoverCardTrigger>
-					<HoverCardContent class="text-balance text-sm px-3 py-2 text-primary/80">
+					<HoverCardContent class="text-balance px-3 py-2 text-sm text-primary/80">
 						<span v-html="task.Description" />
 					</HoverCardContent>
 				</HoverCard>
 			</div>
 		</div>
 
-		<div class="overflow-y-auto flex flex-col gap-2">
+		<div class="flex flex-col gap-2 overflow-y-auto">
 			<code v-for="[index, output] in cmdOutputs.entries()" :key="index">
 				{{ output }}
 			</code>
